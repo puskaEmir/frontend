@@ -3,8 +3,8 @@ const baseUrl = "http://localhost:8081";
 //Metod calls to load initial data
 const initialPage = 1;
 let pageCount;
-let firstVisibleButton = 1;
-let lastVisibleButton = 10;
+
+
 
 function loadPage(page, pageSize) {
   const adresa = `${baseUrl}/api/film?page=${page}&pageSize=${pageSize}`;
@@ -46,38 +46,31 @@ function addFilmsToTableBody(films) {
   }
 }
 
+
+let start;
+let end;
+let numberOfShownPageButtons = 10;
+
 function createPagination(totalPages) {
   const paginationDiv = document.getElementById("pagination");
   paginationDiv.innerHTML = "";
-  const max = lastVisibleButton > totalPages ? totalPages : lastVisibleButton;
-  for (let i = 1; i <= max; i++) {
+  start = start ? start : 1;
+  end = end ? end : numberOfShownPageButtons;
+  end = end > totalPages ? totalPages : end;
+  console.log(totalPages);
+  console.log(`Range ${start} -  ${end}`);
+  if (start > numberOfShownPageButtons) {
     const pageLink = document.createElement("a");
-    pageLink.href = "#";
-    pageLink.textContent = i;
-    pageLink.addEventListener("click", () => loadPage(i, pageSizeInput.value));
-    paginationDiv.appendChild(pageLink);
-  }
-  if (lastVisibleButton < totalPages) {
-    const pageLink = document.createElement("a");
-    pageLink.textContent = ">>";
-    const start = max + 1; //11
-    firstVisibleButton = start;
-    let end = max + 10; //20
-    console.log(end);
-    if (end > totalPages) {
-      end = totalPages;
+    pageLink.textContent = "<<";
+    pageLink.addEventListener("click", () => {
+      start = start - numberOfShownPageButtons;
+      end = end - numberOfShownPageButtons;
+      end = totalPages < end ? totalPages : end;
+      createPagination(totalPages)
     }
-    lastVisibleButton = end;
-    pageLink.addEventListener("click", () =>
-      createNewPagination(start, end, totalPages)
     );
     paginationDiv.appendChild(pageLink);
   }
-}
-
-function createNewPagination(start, end, totalPages) {
-  const paginationDiv = document.getElementById("pagination");
-  paginationDiv.innerHTML = "";
   for (let i = start; i <= end; i++) {
     const pageLink = document.createElement("a");
     pageLink.href = "#";
@@ -85,25 +78,25 @@ function createNewPagination(start, end, totalPages) {
     pageLink.addEventListener("click", () => loadPage(i, pageSizeInput.value));
     paginationDiv.appendChild(pageLink);
   }
-
-  const pageLink = document.createElement("a");
-  pageLink.textContent = ">>";
-  const min = end + 1; //11
-  firstVisibleButton = start;
-  let max = end + 10; //20
-  console.log(end);
-  if (max > totalPages) {
-    max = totalPages;
+  if (end < totalPages) {
+    const pageLink = document.createElement("a");
+    pageLink.textContent = ">>";
+    pageLink.addEventListener("click", () => {
+      start = start + numberOfShownPageButtons;
+      end = end + numberOfShownPageButtons;
+      end = totalPages < end ? totalPages : end;
+      createPagination(totalPages)
+    }
+    );
+    paginationDiv.appendChild(pageLink);
   }
-  lastVisibleButton = end;
-  pageLink.addEventListener("click", () => createNewPagination(min, max));
-  paginationDiv.appendChild(pageLink);
 }
+
 
 const pageSizeInput = document.querySelector("#pageSizeInput");
 pageSizeInput.addEventListener("change", () => {
-  console.log(pageSizeInput.value);
-  console.log(`Previous page count ${pageCount}`);
+  start = 1; 
+  end = 10;
   loadPage(1, pageSizeInput.value);
 });
 
