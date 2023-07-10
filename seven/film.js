@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:8081";
+const baseUrl = "http://localhost:8080";
 
 //Metod calls to load initial data
 const initialPage = 1;
@@ -14,6 +14,7 @@ function loadPage(page, pageSize) {
       "Content-Type": "application/json",
     },
   };
+  console.log(adresa);
   const promise = fetch(adresa, zahtjev);
   promise
     .then((response) => response.json())
@@ -24,8 +25,9 @@ function loadPage(page, pageSize) {
 
 function handlePage(pageData) {
   //pageCount i items
+  console.log(pageData);
   addFilmsToTableBody(pageData.items);
-  pageCount = pageData.pageCount;
+  pageCount = pageData.totalPages;
   createPagination(pageCount);
 }
 
@@ -35,12 +37,12 @@ function addFilmsToTableBody(films) {
   for (let film of films) {
     const row = document.createElement("tr");
     row.innerHTML = `
-              <td>${film.film_id}</td>
+              <td>${film.id}</td>
               <td>${film.title}</td>
               <td>${film.description}</td>
               <td>${film.length}</td>
-              <td>${film.release_year}</td>
-              <td>${film.special_features}</td>
+              <td>${film.releaseYear}</td>
+              <td>${film.specialFeatures}</td>
           `;
     tableBody.appendChild(row);
   }
